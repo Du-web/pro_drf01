@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse,JsonResponse
 
 # Create your views here.
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+
+from userapp.models import User
 
 
 @csrf_exempt
@@ -39,3 +41,33 @@ class UserView(View):
     def delete(self, request, *args, **kwargs):
         print('DELETE请求')
         return HttpResponse('DELETE, 请求成功')
+
+
+class EmployeeView(View):
+    def get(self, request, *args, **kwargs):
+        # user_id = request.GET.get('id')
+        id = kwargs.get('id')
+        print(id)
+        if id:
+            user = User.objects.filter(pk=id).values('username', 'password', 'gender', 'email').first()
+            # user = User.objects.filter(pk=id)[0]
+            if user:
+                return JsonResponse({
+                    'status': 200,
+                    'message': '成功查询',
+                    'results': user
+                })
+            else:
+                return JsonResponse({
+                    "status": 500,
+                    "message": "查询用户不存在",
+                })
+        else:
+            users = User.objects.all().values('username', 'password', 'gender', 'email')
+            return JsonResponse({
+                'status': 200,
+                'message': '成功查询',
+                'results': list(users)
+            })
+
+
