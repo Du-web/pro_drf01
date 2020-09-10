@@ -42,7 +42,7 @@ class UserView(View):
         print('DELETE请求')
         return HttpResponse('DELETE, 请求成功')
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class EmployeeView(View):
     def get(self, request, *args, **kwargs):
         # user_id = request.GET.get('id')
@@ -68,6 +68,24 @@ class EmployeeView(View):
                 'status': 200,
                 'message': '成功查询',
                 'results': list(users)
+            })
+
+
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get('name')
+        pwd = request.POST.get('pwd')
+        email = request.POST.get('email')
+        try:
+            user = User.objects.create(username=name, password=pwd, email=email)
+            return JsonResponse({
+                'status': 200,
+                'message': '创建用户成功',
+                'results': {'username': user.username, 'email': user.email}
+            })
+        except:
+            return JsonResponse({
+                'status': 500,
+                'message': '创建失败'
             })
 
 
