@@ -7,6 +7,8 @@ from rest_framework.response import Response
 
 class UserAPIView(APIView):
     def get(self, request, *args, **kwargs):
+        name = request.GET.get('username')
+        print(name)
         print('get请求')
         return Response('drf get ok')
 
